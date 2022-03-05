@@ -30,7 +30,7 @@ app.get("/api/notes", function (req, res) {
 
 app.post("/api/notes", function (req, res) {
     if (!req.body.title) {
-        return res.json({ error: "Missing required title" });
+      return res.json({ error: "Missing required title" });
     }
 
     const note = { ...req.body, id: uuidv4() }
@@ -40,13 +40,37 @@ app.post("/api/notes", function (req, res) {
 
     fs.writeFile(path.join(__dirname, "db/db.json"), JSON.stringify(dbJSON), (err) => {
         if (err) {
-            return res.json({ error: "Error writing to file" });
+          return res.json({ error: "Error writing to file" });
         }
-            return res.json(note);
+          return res.json(note);
     });
 });
 
-// ----- Starts server ----- //
+// ------- Deleting a Note --------- //
+app.delete("/api/notes/:id", function (req, res) {
+
+    dbJSON = dbJSON.filter(note => {
+      return note.id !== req.params.id
+    })
+
+    // ---- Saves Notes list after note deleted  ----- //
+    fs.writeFile(path.join(__dirname, "db.json"), JSON.stringify(dbJSON), (err) => {
+      if (err) {
+        return res.json({ error: "Error writing to file" });
+      }
+        return res.send();
+    })
+});
+
+app.get("/notes", function (req, res) {
+    res.sendFile(path.join(__dirname, "public/notes.html"));
+});
+
+app.get("*", function (req, res) {
+    res.sendFile(path.join(__dirname, "public/index.html"));
+});
+
+// ----- Starts Server ----- //
 app.listen(PORT, function () {
     console.log("App listening on PORT " + PORT);
 });
