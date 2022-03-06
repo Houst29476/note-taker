@@ -79,7 +79,7 @@ const handleNoteDelete = function (event) {
 };
 
 // ----- Sets the activeNote and displays it ----- //
-const handleNewNoteView = function () {
+const handleNoteView = function () {
   activeNote = $(this).data();
   renderActiveNote();
 };
@@ -99,3 +99,51 @@ const handleRenderSaveBtn = function () {
   }
 };
 
+// ----- Renders the list of note titles ----- //
+const renderNoteList = (notes) => {
+  $noteList.empty();
+
+  const noteListItems = [];
+
+  // ---- returns jquery object for li with given text and delete button
+  // unless withDeleteButton argument is provided as false
+  const create$li = (text, withDeleteButton = true) => {
+    const $li = $("<li class='list-group-item'>");
+    const $span = $("<span>").text(text);
+    $li.append($span);
+
+    if (withDeleteButton) {
+      const $delBtn = $(
+        "<i class='fas fa-trash-alt float-right text-danger delete-note'>"
+      );
+      $li.append($delBtn);
+    }
+    return $li;
+  };
+
+  if (notes.length === 0) {
+    noteListItems.push(create$li("No saved Notes", false));
+  }
+
+  notes.forEach((note) =>{
+    const $li = create$li(note.title).data(note);
+    noteListItems.push($li);
+  });
+
+  $noteList.append(noteListItems);
+};
+
+// ----- Retrieves notes from db and renders to sidebar ----- //
+const getAndRenderNotes = () => {
+  return getNotes().then(renderNoteList);
+};
+
+$saveNoteBtn.on("click", handleNoteSave);
+$noteList.on("click", ".list-group-item", handleNoteView);
+$newNoteBtn.on("click", handleNewNoteView);
+$noteList.on("click", ".delete-note", handleNoteDelete);
+$noteTitle.on("keyup", handleRenderSaveBtn);
+$noteText.on("keyup", handleRenderSaveBtn);
+
+// ----- Retrieves and renders initial list of Notes ----- //
+getAndRenderNotes ();
