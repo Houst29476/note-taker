@@ -48,3 +48,54 @@ const renderActiveNote = () => {
     $noteText.val("");
   }
 };
+
+// ----- handleNoteSave saves note input data to db, updates view ----- //
+const handleNoteSave = function () {
+  const newNote = {
+    title: $noteTitle.val(),
+    text: $noteText.val(),
+  };
+
+  saveNote (newNote).then(() => {
+    getAndRenderNotes();
+    renderActiveNote();
+  });
+};
+
+// ----- Deletes clicked Note ------ //
+const handleNoteDelete = function (event) {
+  event.stopPropagation();
+
+  const note = $(this).parent(".list-group-item").data();
+
+  if (activeNote.id === note.id) {
+    activeNote = {};
+  }
+
+  deleteNote(note.id).then(() => {
+    getAndRenderNotes();
+    renderActiveNote();
+  });
+};
+
+// ----- Sets the activeNote and displays it ----- //
+const handleNewNoteView = function () {
+  activeNote = $(this).data();
+  renderActiveNote();
+};
+
+// ---- Sets the activeNote to an empty object and allows user to enter new note ----- //
+const handleNewNoteView = function () {
+  activeNote = {};
+  renderActiveNote();
+};
+
+// ----- Hide Save button if Notes title or text are emtpy ----- //
+const handleRenderSaveBtn = function () {
+  if (!$noteTitle.val().trim() || !$noteText.val().trim()) {
+    $saveNoteBtn.hide();
+  } else {
+    $saveNoteBtn.show();
+  }
+};
+
